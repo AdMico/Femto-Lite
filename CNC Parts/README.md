@@ -8,7 +8,7 @@ This folder has CNC-ready STEP files for all the various panels of the box. The 
 
 `Femto-Lite_Back_V1-Body.step`: This makes the rear wall of the Femto-Lite box, which supports the access port for the USB-C power supply.
 
-Femto-Lite_Bottom_V1-Body.step`: This makes the baseplate of the Femto-Lite box, with screwpoints for mounting the Femto-Lite PCB.
+`Femto-Lite_Bottom_V1-Body.step`: This makes the baseplate of the Femto-Lite box, with screwpoints for mounting the Femto-Lite PCB.
 
 `Femto-Lite_Front_V1-Body.step`: This makes the front wall of the Femto-Lite box, which is a clean panel.
 
