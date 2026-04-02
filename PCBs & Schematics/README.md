@@ -1,31 +1,35 @@
-# LipidWells v1.0.0 (Updated 01APR26 APM)
+# Femto-Lite v1.0.0 (Updated 02APR26 APM)
 
 **Written by:** Adam Micolich
 
 ## Contents of the *PCBs & Schematics* folder
 
-There are five folders, the contents of these folders are as follows:
+There is a single PCB in the Femto-Lite. The various files and folders are as follows:
 
-*Drill Board*: This is the PCB for the pair of boards that mount on the bottom of the Pinplate and sit either side of the nodule on the Harwin spring-pin sleeve to set the height of the spring-pins on the Pinplate assembly. There is a PDF file showing the PCB design to actual size, along with a folder containing all the Gerber files needed to have this PCB produced. There is no metal on this board, all it has is drill holes, soldermask and silkscreen.
+`Femto-Lite Schematic.pdf`: The schematic diagram for the circuit used in this box.
 
-*MUX Board*: This is the PCB that has all the circuitry for multiplexing the measurement instruments to the devices on the coverslip. I will describe it in more detail in the notes in the next section. There is a photograph of an Assembled MUX Box for reference in building one, along with a PDF file showing the PCB design to actual size, a PDF file showing the schematic diagrams for the circuit, and a folder containing all the Gerber files needed to have this PCB produced. It is a fairly standard two-layer PCB.
+`Femto-Lite PCB Design.pdf`: PCB design shown to actual size.
 
-*Pin Breakout Board*: This is the PCB that mounts on the top of the Pinplate and which connects the 27 Harwin spring-pins on each side to a corresponding 30-pin ribbon cable. A photograph of a completed version of this PCB, as mounted on the Pinplate, can be found in the *Stage Parts* sub-folder of the *CNC Parts* folder. There is a PDF file showing the PCB design to actual size, a PDF file showing the schematic diagram for the circuit, and a folder containing all the Gerber files needed to have this PCB produced. It is a fairly standard two-layer PCB.
+`Femto-Lite Parts List.pdf`: Parts list for all the components needed for assembly.
 
-*Sidepanel Board*: This is a PCB that mounts in the left wall of the MUX Box and which acts as a feedthrough for the two 30-pin and one 40-pin ribbon cables from inside to outside the box. There is a PDF file showing the PCB design to actual size, a PDF file showing the schematic diagram for the circuit, and a folder containing all the Gerber files needed to have this PCB produced. It is a fairly standard four-layer PCB, designed to maintain the ground-screening of the left-box wall as much as practicable (in hindsight, perhaps overkill, but interesting to convince myself it could be done should it ever be required for measurements where the signal-to-noise ratio is more difficult that it was in this experiment).
+`Femto-Lite Assembled 1.jpeg`: Photograph of an assembled Femto-Lite with top panel in place.
 
-*Test Device Board*: There are actually two PCBs in this folder, which are slight variants of each other. The intention is to make a PCB that can act as a 'dummy device' for testing the electronics/software, without needing to use device coverslips. The 'single' version has a pair of resistors, one for each 'side' of the device, that give a common value on all lines during testing. We invariably always put a 1K, 3K or 10K resistor in here for both positions. The 'multi' version is designed to look more like a real device, in that different lines give slightly different values, and we put a random selection of 2.7K, 3.0K and 3.3K resistors into the 26 SMD resistor positions on this test board. In both cases there is a PDF file showing the PCB design to actual size, and a folder containing all the Gerber files needed to have these PCBs produced. It is a fairly standard two-layer PCB.
+`Femto-Lite Assembled 2.jpeg`: Photograph of an assembled Femto-Lite with top panel removed.
+
+`Femto-Lite Specs.pdf`: Plots of output voltage vs input current for the two gain settings 1000V/A and 10000V/A.
+
+*Gerber Files*: A folder containing all the Gerber files needed to have these PCBs produced. It is a fairly standard two-layer PCB.
 
 We get these PCBs made for us by PCBWay in China.
 
-## Brief discussion of the circuit design aspects for the MUX Box
+## Brief discussion of the circuit design aspects for the Femto-Lite
 
-The schematic for the Mux Board has two sheets, one for the power circuit and one for the signal circuit.
+The Femto DLPCA-200 current pre-amplifier has long been used in electrical measurement setups at UNSW, often for measuring current signals that simply don't require the performance (and the price it entails) provided by the DLPCA-200. This instrument was designed to provide a simple, low-cost two-channel equivalent of a Femto DLPCA-200 for the measurement of d.c. and quasi-d.c. currents in the mA to high uA range.
 
-The signal circuit is designed to interface the 60-lines going to the coverslip (54 device lines plus 6 extra lines for ground and gate voltage) to the four BNC connectors that are connected to the analog outputs (AO0/AO1) of the National Instruments USB-6216-BNC and the inputs of the two Femto DLPCA-200 current pre-amplifiers. The switching is performed by a set of four Analog Devices MAX306 16-channel CMOS multiplexer ICs, a pair for each of the 30-pin ribbon cables, that are bit-controlled by the GPIO lines of the Raspberry Pi included in the setup. They are powered by +/-15V rails to minimise the resistance contribution that they make to the measurement lines.
+The circuit centres on a traditional transimpedance amplifier circuit using the Texas Instruments TLV2721 Op-amp. The circuit is designed with two gain settings 1000 V/A and 10000 V/A that can be switched between using jumpers. Notionally, other gains could be obtained simply by replacing the feedback resistors on the op-amp, which are simply precision 0805 SMT resistors.
 
-The power circuit is designed to provide the +/-15V supply for the multiplexers. For noise reasons, we elected to do this using a set of four 9V batteries, which provide up to 18V either side of ground. The batteries are split into positive (2 x 9V) and negative (2 x 9V) banks, each of which connect to a DPDT toggle switch on the MUXBox top panel. This switch in the left-hand position connects the batteries to the upper part of the circuit diagram in the schematic, which is a circuit to 'clean-up' the voltage to +/-15V rails. The central position isolates the batteries. The right-hand position connects them to the lower part of the circuit diagram in the schematic, which is a circuit to quickly check the voltage state of the batteries. The green LED and upper SPST momentary switch for each bank (S3/U1/LED3 or S4/U2/LED4) is there to confirm the battery is active and supplying voltage. The red LED and lower SPST momentary switch for each bank is a basic 'low voltage' circuit, which activates the red LED if the battery bank no longer has sufficient overhead (voltage in excess of 15V) to ensure the voltage regulators (IC2/IC3) can supply correctly to the MUX ICs. If battery test gives green LED on and red LED off, then the battery is good for use. If the battery test gives green LED on and red LED on, the battery is low, and if neither LED is on, the battery is probably totally flat (or not connected).
+The circuit is powered using a USB-C power supply, which is fed into an isolated dc-dc converter to provide +/-5V rails for the op-amp, such that the amplifier can work bipolar rather than unipolar. As such, the voltage outputs saturate at around 5V -- there is no overload circuitry in order to keep costs down, so a user needs to be cognizant of ensuring the input signal does not become to high. Breaking the circuit is unlikely unless the current overload is severe, the measurement will just be 'clipped'.
 
-The upper part of the power circuit is broken into two parts. The section on the left is focussed around the DPDT latching relay K1, which will either connect the downstream ICs (IC1, IC2, IC3 and MUXes) to the batteries, or ground all these parts of the circuit to protect them from ESD when the MUXBox is not in use. The relay K1 is driven by GPIO lines from the Raspberry Pi, and is controlled by the PyNE-wells software. Thereafter IC1 is a rail virtual ground IC intended to balance any difference in output voltage of the two banks so that the resulting rails are 'symmetric' about zero, and IC2 and IC3 are positive and negative voltage regulators to step battery voltage down to +/-15V for the MUX ICs.
+The remaining jumpers are provided for grounding versatility (e.g., noise optimisation). There are two banks of screw-terminals on the board for the BNC connections -- note that each of these appears twice in the schematic to enable the connections to be properly mapped, the BNC connections come in at the screw-points, the circuit connections are the solder pins, respectively.
 
-The Raspberry Pi is connected to the ethernet, and controlled via TCP/IP connection from the PyNE-wells software, which handles all the aspects of the measurement, which includes the switching of the multiplexer connections, the output voltages on AO0 and AO1 of the USB-6216-BNC and the input voltages AI0 and AI1, which return the voltage outputs from the two FEMTO DLPCA-200 current preamplifiers.
+The circuit behaves with good linearity to almost zero input current. Note that the output voltage is the opposite sign of the input current, an inherent aspect of the transimpedance amplifier, where V_out = -I_in/R_F where R_F is the feedback resistance.
